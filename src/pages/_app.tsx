@@ -36,11 +36,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
           enableSystem
           disableTransitionOnChange
         >
-          <div className={`font-sans ${poppins.variable}`}>
+          <main className={`font-sans ${poppins.variable}`}>
             <Navbar />
             <Component {...pageProps} />
             <Toaster />
-          </div>
+          </main>
         </ThemeProvider>
       </SessionProvider>
     </>

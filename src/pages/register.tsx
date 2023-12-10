@@ -24,6 +24,8 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { api } from "@/utils/api";
+import Link from "next/link";
 
 const Register = () => {
   const router = useRouter();
@@ -46,19 +48,28 @@ const Register = () => {
     },
   });
 
-  const onSubmit = async (data: RegisterSchema) => {
-    const { email, password } = data;
+  const registerMutation = api.auth.registerWithEmailAndPassword.useMutation();
+
+  const handleRegister = async (data: RegisterSchema) => {
+    const { name, surname, email, password } = data;
 
     console.log("data", data);
 
-    // if (result === true) {
-    //   toast.success("Successfully registered.");
-    //   void router.push("/login");
-    // } else if (result === false) {
-    //   toast.error("You have already register with this email.");
-    // } else {
-    //   toast.error("Unexpected Error");
-    // }
+    const result = await registerMutation.mutateAsync({
+      name,
+      surname,
+      email,
+      password,
+    });
+
+    if (result === true) {
+      toast.success("Successfully registered.");
+      void router.push("/login");
+    } else if (result === false) {
+      toast.error("You have already register with this email.");
+    } else {
+      toast.error("Unexpected Error");
+    }
   };
 
   return (
@@ -71,7 +82,7 @@ const Register = () => {
           </CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(handleRegister)}>
             <CardContent className="flex flex-col space-y-4">
               <div className="justify-between space-y-4 sm:flex sm:space-y-0">
                 <FormField
@@ -193,6 +204,16 @@ const Register = () => {
             </CardFooter>
           </form>
         </Form>
+        <p className="flex justify-center gap-2 pb-6 text-sm">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-purple hover:text-purple/75 transition-colors"
+            onClick={() => router.push("/login")}
+          >
+            Login
+          </Link>
+        </p>
       </Card>
     </MaxWidthWrapper>
   );

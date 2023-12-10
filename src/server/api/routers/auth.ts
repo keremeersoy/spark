@@ -1,7 +1,7 @@
-import { registerSchema } from "@/schemas/auth";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import bcrypt from "bcryptjs";
 import { db } from "@/server/db";
+import { z } from "zod";
 
 export const authRouter = createTRPCRouter({
   hello: publicProcedure.query(() => {
@@ -10,7 +10,14 @@ export const authRouter = createTRPCRouter({
     };
   }),
   registerWithEmailAndPassword: publicProcedure
-    .input(registerSchema)
+    .input(
+      z.object({
+        name: z.string(),
+        surname: z.string(),
+        email: z.string().email(),
+        password: z.string().min(6),
+      }),
+    )
     .mutation(async ({ input }) => {
       let user = await db.user.findFirst({
         where: {
@@ -21,6 +28,8 @@ export const authRouter = createTRPCRouter({
       if (!user) {
         const newUser = await db.user.create({
           data: {
+            name: input.name,
+            surname: input.surname,
             email: input.email,
           },
         });
